@@ -1,0 +1,3 @@
+*.c linguist-language=c
+*.py linguist-language=python
+*.cpp linguist-language=c++
