@@ -21,7 +21,8 @@ def onMouse(event, x, y, flags, prams):
         selectObject = False  
         trackObject = -1  
   
-cap = cv2.VideoCapture('1.mp4')  
+cap = cv2.VideoCapture('1.mp4')
+#cap = cv2.VideoCapture(0)
 ret, frame = cap.read()  
 cv2.namedWindow('imshow', 0)  
 cv2.setMouseCallback('imshow', onMouse)  
