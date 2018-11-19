@@ -2,7 +2,6 @@
 '''
 1.新建M*N的零矩阵
 2.分9宫格随机分配颜色,并记录颜色值
-
 3.显示图片及单元格颜色数值
 4.单击某格颜色-1,并记录颜色值
 5.新建相同大小零矩阵,分9宫格分配上次颜色,并记录颜色值
@@ -20,10 +19,10 @@ def onmouse(event, x, y, flags, param):
 		i, j = in_which_part(img, x, y)
 
 		#	4.单击某格颜色-1,并记录颜色值
-		if img[i*100+1][j*100+1] == 0:
-			img[(i*100):(i*100+100), (j*100):(j*100+100)] = 255
+		if img[j*100+1][i*100+1] == 0:
+			img[(j*100):(j*100+100), (i*100):(i*100+100)] = 255
 		else:
-			img[(i*100):(i*100+100), (j*100):(j*100+100)] -= 1
+			img[(j*100):(j*100+100), (i*100):(i*100+100)] -= 1
 
 		
 		#	5.新建相同大小零矩阵,分9宫格分配上次颜色,并记录颜色值
@@ -51,13 +50,14 @@ def init_img(img):
 def draw_img(img):
 	for i in range(3):
 		for j in range(3):
-			cv2.putText(img, str(img[i*100+1][j*100+1]), (i*100+50, j*100+50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,0,255), 1)
-
+			# print(i, j, img[i*100+1][j*100+1])
+			cv2.putText(img, str(img[j*100+1][i*100+1]), (i*100+50, j*100+50), cv2.FONT_HERSHEY_COMPLEX, 1, (0,0,255), 1)
+	# print("------------------")
 	return img
 
 def in_which_part(img, x, y):
 	w, h = img.shape[0], img.shape[1]
-	return x / (w / 3), y / (h / 3)
+	return int(x / (w / 3)), int(y / (h / 3))
 
 if __name__ == '__main__':
 	#	1.新建M*N的零矩阵
