@@ -4,7 +4,7 @@ import copy
 
 
 def create_maze_mat(width, height, pixel):  # create maze in while block
-    maze = np.zeros((height * pixel, width * pixel)) + 255
+    maze = np.zeros((height * pixel, width * pixel, 3)) + 255
 
     for i in range(1, width):
         cv2.line(maze, (i * pixel, 0), (i * pixel, height * pixel), (0, 0, 0))
@@ -92,7 +92,10 @@ def draw_way(maze_mat, l, pixel):   #draw the whole path
     for x, y in l:
         x *= pixel
         y *= pixel
-        cv2.circle(maze_mat, (y + int(pixel / 2), x + int(pixel / 2)), 1, (0, 255, 255))
+        #cv2.circle(maze_mat, (y + int(pixel / 2), x + int(pixel / 2)), 1, (0, 255, 255))
+        maze_mat[y:y+pixel, x:x+pixel, 0] = 255
+        maze_mat[y:y+pixel, x:x+pixel, 1] = 100
+        maze_mat[y:y+pixel, x:x+pixel, 2] = 0
     return maze_mat
 
 
@@ -129,10 +132,10 @@ if __name__ == '__main__':
     pixel = 20  #pixel of each block
     width = 50  #maze width
     height = 50 #maze height
-    block_num = width * height - 800    #the block num of maze
+    block_num = width * height - 1000    #the block num of maze
     count = 1
 
-    can_finish_flag = False #flag of whether the maze can be through 
+    can_finish_flag = False #flag of whether the maze can through 
 
     total = 10  #get total num of maze picture
     whole_num = 2000    #loop num of each block_num
