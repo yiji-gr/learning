@@ -93,9 +93,10 @@ def draw_way(maze_mat, l, pixel):   #draw the whole path
         x *= pixel
         y *= pixel
         #cv2.circle(maze_mat, (y + int(pixel / 2), x + int(pixel / 2)), 1, (0, 255, 255))
-        maze_mat[y:y+pixel, x:x+pixel, 0] = 255
-        maze_mat[y:y+pixel, x:x+pixel, 1] = 100
-        maze_mat[y:y+pixel, x:x+pixel, 2] = 0
+        a = np.random.randint(0, 256, 3)
+        a[a<20] = 20
+        a[a>230] = 230
+        maze_mat[y:y+pixel, x:x+pixel] = np.random.randint(0, 256, 3)
     return maze_mat
 
 
