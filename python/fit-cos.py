@@ -4,20 +4,19 @@ import numpy as np
 import warnings
 
 warnings.filterwarnings("ignore",".*GUI is implemented.*")
-for n in range(2, 57):
-	if n != 56:
+total = 100
+for n in range(2, total + 1):
+	if n != total:
 		dict1 = {'a' + str(i) : 0 for i in range(n + 1)}
 		dict1['a0'] = 1
 
 		cos_gradient = [0, -1, 0, 1]
 
-		
 		for i in range(1, n + 1):
 			index = i % 4 - 1
 			dict1['a' + str(i)] = cos_gradient[index] * 1.0 / math.factorial(i)
 
-
-		x_cood = np.arange(0, 20, 0.01)
+		x_cood = np.arange(0, 36, 0.01)
 		y1_cood = np.cos(x_cood)
 
 		y_result = ''
@@ -28,14 +27,14 @@ for n in range(2, 57):
 
 		plt.ylim(ymin=-2, ymax=2)
 		plt.plot(x_cood, y1_cood, label='cos(x)')
-		plt.plot(x_cood, eval(y_result) + 1, label='fitting')
+		plt.plot(x_cood, eval(y_result) + 1, label='fitting '+str(n))
 		plt.legend(loc='upper left',frameon=False) 
 		plt.pause(0.01) 
 		plt.clf()
 	else:
 		plt.ylim(ymin=-2, ymax=2)
 		plt.plot(x_cood, y1_cood, label='cos(x)')
-		plt.plot(x_cood, eval(y_result) + 1, label='fitting')
+		plt.plot(x_cood, eval(y_result) + 1, label='fitting_done')
 		plt.legend(loc='upper left',frameon=False) 
 		plt.pause(0.01) 
 		plt.show()
