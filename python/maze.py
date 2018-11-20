@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import copy
+import os
 
 
 def create_maze_mat(width, height, pixel):  # create maze in while block
@@ -24,16 +25,17 @@ def maze_block(maze, num, pixel):   #random generate black block
 
     for row, col in zip(row_list, col_list):
         if (row or col) and (row != int(maze.shape[0] / pixel) - 1 or col != int(maze.shape[1] / pixel) - 1):
+            if (row, col) not in index_list:
+                index_list.append((row, col))
             row *= pixel
             col *= pixel
             maze[row:row + pixel, col: col + pixel] = 0
-            index_list.append((row, col))
     # index_list = sorted(index_list, key=lambda x: x[1])
     # index_list = sorted(index_list, key=lambda x: x[0])
     return maze, index_list
 
 
-def bfs(maze, l, empty_l, num):
+def bfs(maze, l, empty_l):
     while True:
         x, y = l[0]
         if x == len(maze) - 1 and y == len(maze[0]) - 1:
@@ -48,7 +50,6 @@ def bfs(maze, l, empty_l, num):
                 empty_l[x1][y1] = empty_l[x][y] + 1
 
         del l[0]
-        num += 1
 
 
 def get_bfs_path(l1, x, y, l):  #get shortest path
@@ -89,14 +90,18 @@ def dfs(maze_list, l, visited):
 
 
 def draw_way(maze_mat, l, pixel):   #draw the whole path
+    l.reverse()
     for x, y in l:
         x *= pixel
         y *= pixel
         #cv2.circle(maze_mat, (y + int(pixel / 2), x + int(pixel / 2)), 1, (0, 255, 255))
-        a = np.random.randint(0, 256, 3)
-        a[a<20] = 20
-        a[a>230] = 230
-        maze_mat[y:y+pixel, x:x+pixel] = np.random.randint(0, 256, 3)
+        # a = np.random.randint(0, 256, 3)
+        a = [(0, 255, 255), (255, 255, 0), (255, 0, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)]
+        b = np.random.randint(0, len(a), 1)[0]
+        maze_mat[x:x+pixel, y:y+pixel] = a[b]#(0, 0, 255)
+        # np.random.randint(0, 256, 3)
+        cv2.imshow("1", maze_mat)
+        cv2.waitKey(100)
     return maze_mat
 
 
@@ -133,23 +138,22 @@ if __name__ == '__main__':
     pixel = 20  #pixel of each block
     width = 50  #maze width
     height = 50 #maze height
-    block_num = width * height - 1000    #the block num of maze
+    block_num = width * height - 1100    #the block num of maze
     count = 1
 
     can_finish_flag = False #flag of whether the maze can through 
 
     total = 10  #get total num of maze picture
-    whole_num = 2000    #loop num of each block_num
+    whole_num = 1000    #loop num of each block_num
     while count < whole_num:
-        print(block_num, count)
+        print("block_num %d, search num %d" %(block_num, count))
         count += 1
 
         maze_mat = create_maze_mat(width, height, pixel)
         maze_mat, index_list = maze_block(maze_mat, block_num, pixel)
         maze_list = [[0 for _ in range(width)] for _ in range(height)]
         for x, y in index_list:
-            maze_list[int(x / pixel)][int(y / pixel)] = 1
-
+            maze_list[x][y] = 1
 
         if not is_blocked(maze_list, []):
             # dfs method
@@ -160,11 +164,14 @@ if __name__ == '__main__':
 
             # bfs method
             empty_list = [[0 for _ in range(width)] for _ in range(height)]
-            l = get_bfs_path(bfs(maze_list, [[0, 0]], empty_list, 0),
-                             len(maze_list) - 1, len(maze_list[0]) - 1, [[0, 0]])
+            l = get_bfs_path(bfs(maze_list, [[0, 0]], empty_list),
+                             len(maze_list) - 1, len(maze_list[0]) - 1, [])
+            l.append([0, 0])
 
             maze_mat = draw_way(maze_mat, l, pixel)
-            cv2.imwrite(str(block_num) + '_' + str(count) + '_' + str(len(l)) + ".jpg", maze_mat)
+            if not os.path.exists('maze_img'):
+                os.mkdir('maze_img')
+            cv2.imwrite('maze_img/'+str(block_num) + '_' + str(count) + '_' + str(len(l)) + ".jpg", maze_mat)
 
             total -= 1
             if not total:
