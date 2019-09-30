@@ -37,12 +37,12 @@ def set_zero(a):
 
 def init_block1():
 	block1_top = random.randint(1, 6)
-	block1_bottom = block1_top + 2
+	block1_bottom = block1_top + random.randint(2, 4)
 	return block1_top, block1_bottom
 
 def init_block2():
 	block2_top = random.randint(1, 6)
-	block2_bottom = block2_top + 2
+	block2_bottom = block2_top + random.randint(2, 4)
 	return block2_top, block2_bottom
 
 def get_a(a):
@@ -71,7 +71,7 @@ def game_over(temp_fig):
 if __name__ == '__main__':
 	a = [[0 for i in range(size)] for j in range(size)]
 	fig = np.zeros((scale*size, scale*size, 3)) + 255
-	# fig = draw_line(fig)
+	fig = draw_line(fig)
 
 	block1_top, block1_bottom = init_block1()
 	block2_top, block2_bottom = init_block2()
@@ -100,11 +100,11 @@ if __name__ == '__main__':
 		if bird_row >= size:
 			bird_row = size - 1
 		if block1_col < 0:
-			block1_col = size - 1
+			block1_col = random.randint(block2_col + 5, size - 1)
 			block1_top, block1_bottom = init_block1()
 			score += 1
 		if block2_col < 0:
-			block2_col = size - 1
+			block2_col = random.randint(block1_col + 5, size - 1)
 			block2_top, block2_bottom = init_block2()
 			score += 1
 
