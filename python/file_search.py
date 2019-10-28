@@ -3,7 +3,6 @@ import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel, \
     QLineEdit, QTextEdit, QFileDialog, QMessageBox, QProgressDialog, QApplication
 from PyQt5.QtCore import Qt
-from Tetris import *
 
 
 class Yiji(QWidget):
@@ -13,7 +12,7 @@ class Yiji(QWidget):
 
     def initUI(self):
         self.setGeometry(300, 300, 750, 550)
-        self.setWindowTitle('gr_app')
+        self.setWindowTitle('文件查找')
 
         w1 = QVBoxLayout(self)
 
@@ -32,8 +31,6 @@ class Yiji(QWidget):
 
         btn3 = QPushButton('清空', self)
         btn3.clicked.connect(self.on_click3)
-
-        self.btn4 = QPushButton('Tetris', self)
 
         self.cb3 = QCheckBox('grep', self)
 
@@ -59,7 +56,6 @@ class Yiji(QWidget):
         h1.addWidget(btn1)
         h1.addWidget(btn2)
         h1.addWidget(btn3)
-        h1.addWidget(self.btn4)
 
         h2.addWidget(self.qlabel1)
         h2.addWidget(self.line1)
@@ -96,13 +92,13 @@ class Yiji(QWidget):
         self.line1.setText(file_dir)
 
     def on_click2(self):
-        key_word = self.line2.text()
         file_dir = self.line1.text()
+        self.key_word = self.line2.text()
         if self.step != 0 or self.file_num != 0 or self.found != 0:
             QMessageBox.information(self, "查找", "请先点击清空按钮清除缓存", QMessageBox.Yes)
         elif file_dir == '' or not os.path.exists(file_dir):
             QMessageBox.information(self, "查找", "文件夹不存在", QMessageBox.Yes)
-        elif key_word == '':
+        elif self.key_word == '':
             QMessageBox.information(self, "查找", "请先输入要查找的关键字", QMessageBox.Yes)
         else:
             self.get_file_num(file_dir)
@@ -114,9 +110,9 @@ class Yiji(QWidget):
             self.qpd.setRange(0, self.file_num)
 
             if not self.cb3.isChecked():
-                self.file_search(file_dir, key_word)
+                self.file_search(file_dir)
             else:
-                self.grep(file_dir, key_word)
+                self.grep(file_dir)
 
             self.qpd.setValue(self.file_num)
 
@@ -141,7 +137,50 @@ class Yiji(QWidget):
         elif e.key() == Qt.Key_Escape:
             self.close()
 
-    def grep(self, cur_dir, key_word):
+    def read_file(self, file_path):
+        try:
+            with open(file_path) as f:
+                return f.readlines()
+        except UnicodeError:
+            try:
+                with open(file_path, encoding='utf-8') as f:
+                    return f.readlines()
+            except UnicodeError:
+                try:
+                    with open(file_path, encoding='gbk') as f:
+                        return f.readlines()
+                except UnicodeError:
+                    try:
+                        with open(file_path, encoding='ansi') as f:
+                            return f.readlines()
+                    except UnicodeError:
+                        try:
+                            with open(file_path, encoding='gb2312') as f:
+                                return f.readlines()
+                        except UnicodeError:
+                            try:
+                                with open(file_path, encoding='gb18030') as f:
+                                    return f.readlines()
+                            except UnicodeError:
+                                try:
+                                    with open(file_path, encoding='big5') as f:
+                                        return f.readlines()
+                                except UnicodeError:
+                                    try:
+                                        with open(file_path, encoding='cp936') as f:
+                                            return f.readlines()
+                                    except UnicodeError:
+                                        try:
+                                            with open(file_path, encoding='utf-16') as f:
+                                                return f.readlines()
+                                        except UnicodeError:
+                                            try:
+                                                with open(file_path, encoding='utf-32') as f:
+                                                    return f.readlines()
+                                            except UnicodeError:
+                                                print(file_path, 'UnicodeError')
+
+    def grep(self, cur_dir):
         if self.qpd.wasCanceled():
             return
         if self.cb2.isChecked():
@@ -154,42 +193,30 @@ class Yiji(QWidget):
 
                 self.step += 1
                 self.qpd.setValue(self.step)
+                file_path = cur_dir + '/' + each
                 # print(cur_dir, each, self.step, self.file_num)
 
-                if os.path.isdir(cur_dir + '/' + each) and cur_dir.split('/')[-1][0] != '.':
-                    self.grep(cur_dir + '/' + each, key_word)
+                if os.path.isdir(file_path):
+                    self.grep(file_path)
                 else:
-                    if self.cb1.isChecked():
-                        with open(cur_dir + '/' + each) as fp:
-                            count = 0
-                            try:
-                                for line in fp.readlines():
-                                    if key_word.lower() in line.lower():
-                                        count += 1
-                                        self.found += 1
-                                        self.text.append(cur_dir + '/' + each + ' line ' + str(count) + ' ' + line)
-                                        if self.cb2.isChecked():
-                                            print(cur_dir + '/' + each + ' line ' + str(count) + ' ' + line, file=f)
-                            except UnicodeError:
-                                pass
-                    else:
-                        with open(cur_dir + '/' + each) as fp:
-                            count = 0
-                            try:
-                                for line in fp.readlines():
-                                    if key_word in line:
-                                        count += 1
-                                        self.found += 1
-                                        self.text.append(cur_dir + '/' + each + ' line ' + str(count) + ' ' + line)
-                                        if self.cb2.isChecked():
-                                            print(cur_dir + '/' + each + ' line ' + str(count) + ' ' + line, file=f)
-                            except UnicodeError:
-                                pass
+                    lines = self.read_file(file_path)
+                    if lines is None:
+                        return
+                    line_count = 0
+                    for line in lines:
+                        line_count += 1
+                        if self.key_word in line or (self.cb1.isChecked() and self.key_word.lower() in line.lower()):
+                            self.found += 1
+                            show_message = file_path + '    line ' + str(line_count) + '    ' + line.strip()
+                            self.text.append(show_message)
+                            if self.cb2.isChecked():
+                                print(show_message, file=f)
 
         except OSError:
+            # print(cur_dir, 'OSError')
             pass
 
-    def file_search(self, cur_dir, key_word):
+    def file_search(self, cur_dir):
         if self.qpd.wasCanceled():
             return
         if self.cb2.isChecked():
@@ -203,32 +230,22 @@ class Yiji(QWidget):
                 self.qpd.setValue(self.step)
                 # print(self.step, self.file_num)
 
-                if self.cb1.isChecked():
-                    if key_word.lower() in each.lower():
-                        self.found += 1
-                        self.text.append(cur_dir + '/' + each)
-                        if self.cb2.isChecked():
-                            print(cur_dir + '/' + each, file=f)
-                else:
-                    if key_word in each:
-                        self.found += 1
-                        self.text.append(cur_dir + '/' + each)
-                        if self.cb2.isChecked():
-                            print(cur_dir + '/' + each, file=f)
+                if self.key_word in each or (self.cb1.isChecked() and self.key_word.lower() in each.lower()):
+                    self.found += 1
+                    show_message = cur_dir + '/' + each
+                    self.text.append(show_message)
+                    if self.cb2.isChecked():
+                        print(show_message, file=f)
 
                 if os.path.isdir(cur_dir + '/' + each):
-                    self.file_search(cur_dir + '/' + each, key_word)
+                    self.file_search(cur_dir + '/' + each)
         except OSError:
+            # print(cur_dir, 'OSError')
             pass
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     yiji = Yiji()
-    tetris = Tetris()
     yiji.show()
-    yiji.btn4.clicked.connect(tetris.show)
-    yiji.btn4.clicked.connect(yiji.hide)
-    # tetris.btn.clicked.connect(yiji.show)
-    # tetris.btn.clicked.connect(tetris.hide)
     sys.exit(app.exec_())
