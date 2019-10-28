@@ -71,7 +71,7 @@ def game_over(temp_fig):
 if __name__ == '__main__':
 	a = [[0 for i in range(size)] for j in range(size)]
 	fig = np.zeros((scale*size, scale*size, 3)) + 255
-	fig = draw_line(fig)
+	#fig = draw_line(fig)
 
 	block1_top, block1_bottom = init_block1()
 	block2_top, block2_bottom = init_block2()
