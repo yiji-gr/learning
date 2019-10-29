@@ -1,5 +1,7 @@
 import sys
 import os
+import time
+import chardet
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QCheckBox, QLabel, \
     QLineEdit, QTextEdit, QFileDialog, QMessageBox, QProgressDialog, QApplication
 from PyQt5.QtCore import Qt
@@ -137,48 +139,26 @@ class Yiji(QWidget):
         elif e.key() == Qt.Key_Escape:
             self.close()
 
-    def read_file(self, file_path):
+    def read_file(self, file_path):     # 全面但是速度比较慢
+        f = open(file_path, mode="rb")
+        data = f.read()
+        f.close()
+        res = chardet.detect(data)
         try:
-            with open(file_path) as f:
-                return f.readlines()
+            with open(file_path, encoding=res['encoding']) as file:
+                return file.readlines()
         except UnicodeError:
+            # print('UnicodeError', file_path)
+            pass
+
+    def read_file2(self, file_path):
+        encoding_list = ['utf-8', 'gbk', 'ansi', 'gb2312', 'gb18030', 'big5', 'cp936', 'utf-16', 'utf-32']
+        for encoding in encoding_list:
             try:
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding=encoding) as f:
                     return f.readlines()
             except UnicodeError:
-                try:
-                    with open(file_path, encoding='gbk') as f:
-                        return f.readlines()
-                except UnicodeError:
-                    try:
-                        with open(file_path, encoding='ansi') as f:
-                            return f.readlines()
-                    except UnicodeError:
-                        try:
-                            with open(file_path, encoding='gb2312') as f:
-                                return f.readlines()
-                        except UnicodeError:
-                            try:
-                                with open(file_path, encoding='gb18030') as f:
-                                    return f.readlines()
-                            except UnicodeError:
-                                try:
-                                    with open(file_path, encoding='big5') as f:
-                                        return f.readlines()
-                                except UnicodeError:
-                                    try:
-                                        with open(file_path, encoding='cp936') as f:
-                                            return f.readlines()
-                                    except UnicodeError:
-                                        try:
-                                            with open(file_path, encoding='utf-16') as f:
-                                                return f.readlines()
-                                        except UnicodeError:
-                                            try:
-                                                with open(file_path, encoding='utf-32') as f:
-                                                    return f.readlines()
-                                            except UnicodeError:
-                                                print(file_path, 'UnicodeError')
+                pass
 
     def grep(self, cur_dir):
         if self.qpd.wasCanceled():
@@ -199,7 +179,7 @@ class Yiji(QWidget):
                 if os.path.isdir(file_path):
                     self.grep(file_path)
                 else:
-                    lines = self.read_file(file_path)
+                    lines = self.read_file2(file_path)
                     if lines is None:
                         return
                     line_count = 0
