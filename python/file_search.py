@@ -161,13 +161,13 @@ class Yiji(QWidget):
                 pass
 
     def grep(self, cur_dir):
-        if self.qpd.wasCanceled():
-            return
         if self.cb2.isChecked():
             f = open('grep.txt', 'a')
 
         try:
             for each in os.listdir(cur_dir):
+                if self.qpd.wasCanceled():
+                    return
                 if cur_dir[-1] == '/':
                     cur_dir = cur_dir[:-1]
 
@@ -181,7 +181,7 @@ class Yiji(QWidget):
                 else:
                     lines = self.read_file2(file_path)
                     if lines is None:
-                        return
+                        continue
                     line_count = 0
                     for line in lines:
                         line_count += 1
@@ -197,12 +197,12 @@ class Yiji(QWidget):
             pass
 
     def file_search(self, cur_dir):
-        if self.qpd.wasCanceled():
-            return
         if self.cb2.isChecked():
             f = open('file_search.txt', 'a')
         try:
             for each in os.listdir(cur_dir):
+                if self.qpd.wasCanceled():
+                    return
                 if cur_dir[-1] == '/':
                     cur_dir = cur_dir[:-1]
 
