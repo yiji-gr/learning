@@ -2,6 +2,10 @@ import cv2
 import random
 import numpy as np
 
+
+wait_time = 1
+time_step = 100
+stop = False
 def random_create():
 	sudoku = [
 		[0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -59,24 +63,36 @@ def dfs(blank, sudoku, idx):
 	if idx == len(blank):
 		print_sudoku(sudoku)
 		save(sudoku, blank)
-		return
+		return True
 
 	row, col = blank[idx][0], blank[idx][1]
 	for i in range(1, 10):
 		sudoku[row][col] = i
-		show(sudoku, blank)
-		cv2.waitKey(100)
+		if not stop:
+			show(sudoku, blank)
 		if not valid(i, row, col, sudoku):
 			continue
-		dfs(blank, sudoku, idx + 1)
+		if dfs(blank, sudoku, idx + 1):
+			return True
 		sudoku[row][col] = 0
-		show(sudoku, blank)
-		cv2.waitKey(100)
+		if not stop:
+			show(sudoku, blank)
 	sudoku[row][col] = 0
+	return False
 
 def show(sudoku, blank, name="sudoku"):
 	img = draw(sudoku, blank)
 	cv2.imshow(name, img)
+
+	global wait_time, stop
+	key = cv2.waitKey(wait_time)
+	if key == ord('w'):
+		wait_time += time_step
+	elif key == ord('s'):
+		wait_time -= time_step
+	elif key == 27:
+		stop = True
+	wait_time = max(wait_time, 0)
 
 def save(sudoku, blank, img_name="sudoku.jpg"):
 	img = draw(sudoku, blank)
