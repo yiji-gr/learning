@@ -3,7 +3,7 @@ import random
 import numpy as np
 
 
-wait_time = 1
+wait_time = 101
 time_step = 100
 stop = False
 def random_create():
